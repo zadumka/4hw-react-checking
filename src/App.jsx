@@ -19,70 +19,63 @@ export const App = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [dataForModal, setDataForModal] = useState(null);
 
-  useEffect(() => {
-    if (!query) return;
-
-    const fn = async () => {
-      try {
-        setLoading(true);
-        setError(false);
-
-        const data = await fetchImages({ query, page });
-        if (!data?.results?.length) return;
-
-        setImages((prev) => [...prev, ...data.results]);
-      } catch (error) {
-        console.error("Error retrieving images:", error);
-        setError(true);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fn();
-  }, [query, page]);
-
-  const handleSubmit = (query) => {
-    setQuery(query);
+  const SearchValue = searchValue => {
+    setQuery(`${Date.now()}/${searchValue}`);
+    setUnsplash([]);
     setPage(1);
-    setImages([]);
   };
 
-  const handleLoadMore = () => {
-    setPage((prev) => prev + 1);
+  useEffect(() => {
+    if (query === '') {
+      return;
+    }
+    async function ApiData() {
+      try {
+        setLoader(true);
+        const data = await fetchData(query.split('/')[1], page);
+
+        setUnsplash(prevData => [...prevData, ...data.results]);
+        console.log(data);
+        setShow(data.total_pages !== page);
+        if (query.split('/')[1].length === 0) {
+          toast('There are no images for this request');
+        }
+      } catch (error) {
+        setError(true);
+        console.log(error);
+      } finally {
+        setTimeout(() => {
+          setError(false);
+        }, 2000);
+        setLoader(false);
+      }
+    }
+    ApiData();
+  }, [query, page]);
+  const handleClickLoadMore = () => {
+    setPage(page + 1);
   };
 
-  const openModal = (dataForModal) => {
-    setDataForModal(dataForModal);
-    setModalIsOpen(true);
-    document.body.style.overflow = "hidden";
+  const handleOpenModal = (regular, alt) => {
+    setShowModal(true);
+    setRegular(regular);
+    setAlt(alt);
   };
 
-  const closeModal = () => {
-    setDataForModal("");
-    setModalIsOpen(false);
-    document.body.style.overflow = "auto";
+  const handleCloseModal = () => {
+    setShowModal(false);
   };
-
   return (
-    <>
-      <SearchBar onSubmit={handleSubmit} />
-      {images.length > 0 && !error && (
-        <ImageGallery images={images} onImageClick={openModal} />
+    <div>
+      <SearchBar onSubmit={SearchValue} />
+      <Toaster />
+      <ImageGallery items={unsplash} handleClickImage={handleOpenModal} />
+      {loader && <Loader />}
+      {show && <LoadMoreBtn onLoadMore={handleClickLoadMore} />}
+      {error && <ErrorMessage />}
+      {showModal && (
+        <ImageModal alt={alt} src={regular} closetModal={handleCloseModal} value={showModal} />
       )}
-
-      {error && (
-        <ErrorMessage message="Oops, there was an error, please try reloading" />
-      )}
-      {images.length > 0 && <LoadMoreBtn onClick={handleLoadMore} />}
-      {modalIsOpen && (
-        <ImageModal
-          isOpen={modalIsOpen}
-          onRequestClose={closeModal}
-          dataForModal={dataForModal}
-        />
-      )}
-      {loading && <Loader />}
-    </>
+    </div>
   );
 };
