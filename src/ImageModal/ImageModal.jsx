@@ -17,7 +17,7 @@ export const ImageModal = ({
       onRequestClose={onRequestClose}
       overlayClassName={css.modalOverlay}
     >
-      <img src={src} alt={} />
+      <img src={src} alt="" />
     </Modal>
   );
 };
