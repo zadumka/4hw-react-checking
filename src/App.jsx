@@ -1,23 +1,23 @@
-import { useEffect, useState } from "react";
-
-import { SearchBar } from "./SearchBar/SearchBar.jsx";
-import { ImageGallery } from "./ImageGallery/ImageGallery.jsx";
-import { ErrorMessage } from "./ErrorMessage/ErrorMessage.jsx";
-import { LoadMoreBtn } from "./LoadMoreBtn/LoadMoreBtn.jsx";
-import { Loader } from "./Loader/Loader.jsx";
-import { ImageModal } from "./ImageModal/ImageModal.jsx";
-import { fetchImages } from "./service/unsplashAPI.js";
-
-import "./App.css";
+import { useEffect, useState } from 'react';
+import { fetchData } from '../api';
+import { SearchBar } from './SearchBar/SearchBar';
+import { ImageGallery } from './ImageGallery/ImageGallery';
+import { LoadMoreBtn } from './LoadMoreBtn/LoadMoreBtn';
+import toast, { Toaster } from 'react-hot-toast';
+import { ErrorMessage } from './ErrorMessage/ErrorMessage';
+import { Loader } from './Loader/Loader';
+import { ImageModal } from './ImageModal/ImageModal';
 
 export const App = () => {
-  const [query, setQuery] = useState("");
+  const [unsplash, setUnsplash] = useState([]);
+  const [query, setQuery] = useState('');
   const [page, setPage] = useState(1);
-  const [images, setImages] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [show, setShow] = useState(false);
   const [error, setError] = useState(false);
-  const [modalIsOpen, setModalIsOpen] = useState(false);
-  const [dataForModal, setDataForModal] = useState(null);
+  const [loader, setLoader] = useState(false);
+  const [regular, setRegular] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [alt, setAlt] = useState(null);
 
   const SearchValue = searchValue => {
     setQuery(`${Date.now()}/${searchValue}`);
