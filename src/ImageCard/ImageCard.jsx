@@ -1,34 +1,22 @@
 import css from "./ImageCard.module.css";
 
-export const ImageCard = ({
-  image: {
-    urls: { small, regular },
-    alt_description,
-    user: { name, location, total_likes },
-  },
-  onImageClick,
-}) => {
-  const handleImageClick = () => {
-    onImageClick({ src: regular, alt: alt_description });
-  };
-
+const ImageCard = ({ images, onImageOpen }) => {
   return (
-    <div className={css.gallery_item}>
-      <img src={small} alt={alt_description} onClick={handleImageClick} />
-      <ul className={css.img_description}>
-        <li className={css.description_item}>
-          Name:&nbsp;
-          <span className={css.description_span}> {name}</span>
-        </li>
-        <li className={css.description_item}>
-          Location:&nbsp;
-          <span className={css.description_span}> {location}</span>
-        </li>
-        <li className={css.description_item}>
-          Likes:&nbsp;
-          <span className={css.description_span}> {total_likes}</span>
-        </li>
+    <div className={css.image_container}>
+      <ul className={css.image_gallery}>
+        {images.map(({ id, urls }) => (
+          <li key={id}>
+            <img
+              id={id}
+              onClick={onImageOpen}
+              className={css.image_card}
+              src={urls.small}
+              alt="image"
+            />
+          </li>
+        ))}
       </ul>
     </div>
   );
 };
+export default ImageCard;
